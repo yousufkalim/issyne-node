@@ -51,6 +51,9 @@ app.use('/',changeProfilePicRoute);
 const ChangePasswordRoute = require('./routes/ChangePasswordRoute');
 app.use('/',ChangePasswordRoute);
 
+const AdminPanelRoute = require('./routes/AdminPanelRoute');
+app.use('/admin_panel',AdminPanelRoute);
+
 app.listen (3000, () => {
   console.log ('server started');
 });

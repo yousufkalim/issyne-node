@@ -1,23 +1,23 @@
-const express = require ('express');
-const router = express.Router ();
-const multer = require ('multer');
-const bcrypt = require ('bcrypt');
-const storage = multer.diskStorage ({
+const express = require("express");
+const router = express.Router();
+const multer = require("multer");
+const bcrypt = require("bcrypt");
+const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb (null, './uploads/');
+    cb(null, "./uploads/");
   },
   filename: function (req, file, cb) {
-    cb (null, new Date ().getTime () + file.originalname);
+    cb(null, new Date().getTime() + file.originalname);
   },
 });
 const fileFilter = (req, file, cb) => {
   // if (file.mimeType === 'image/jpeg' || file.mimeType === 'image/png')
-  cb (null, true);
+  cb(null, true);
   //else {
   //cb (Error('Invalid File Format'), false);
   // }
 };
-const upload = multer ({
+const upload = multer({
   storage: storage,
   // limits: {
   //   fileSize: 1024 * 1024 * 5,
@@ -25,39 +25,39 @@ const upload = multer ({
   fileFilter: fileFilter,
 });
 
-
-const Firebase = require ('firebase-admin');
-const db = Firebase.database ();
-const userRef = db.ref ('student');
-const teacherRef = db.ref ('teacher');
-router.post ('/register', upload.single ('profileImage'), async (req, res) => {
+const Firebase = require("firebase-admin");
+const db = Firebase.database();
+const userRef = db.ref("student");
+const teacherRef = db.ref("teacher");
+const credit = db.ref("credit");
+router.post("/register", upload.single("profileImage"), async (req, res) => {
   // router.post ('/register', async (req, res) => {
-  var data = JSON.parse (JSON.stringify (req.body));
+  var data = JSON.parse(JSON.stringify(req.body));
   data.avatar = req.file.path;
-  data.type = 'student';
+  data.type = "student";
   userRef
-    .orderByChild ('email')
-    .equalTo (data.email)
-    .once ('value', async function (snapshot) {
-      if (snapshot.val () === null) {
+    .orderByChild("email")
+    .equalTo(data.email)
+    .once("value", async function (snapshot) {
+      if (snapshot.val() === null) {
+        // check if email exists on student
         teacherRef
-          .orderByChild ('email')
-          .equalTo (data.email)
-          .once ('value', async function (snapshot) {
-            if (snapshot.val () === null) {
-              const hashedPassword = await bcrypt.hash (req.body.password, 10);
-              const response = {...data};
+          .orderByChild("email")
+          .equalTo(data.email)
+          .once("value", async function (snapshot) {
+            if (snapshot.val() === null) {
+              // check if email exists on teacher
+              const hashedPassword = await bcrypt.hash(req.body.password, 10);
+              const response = { ...data };
               data.password = hashedPassword;
-              await userRef.push (data, function (err) {
-                if (err) res.send (err);
-                else
-                  res.json ({
-                    response: response,
-                  });
+              userRef.push(data);
+              credit.push({ email: data.email, credit: 0 }); // push student credit
+              res.json({
+                response: response,
               });
-            } else res.json ({messge: 'Email Already Exists'});
+            } else res.json({ message: "Email Already Exists" });
           });
-      } else res.json ({messge: 'Email Already Exists'});
+      } else res.json({ message: "Email Already Exists" });
     });
 
   // console.log(req.body.password);

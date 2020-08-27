@@ -29,7 +29,7 @@ router.post ('/get_credit', async function (req, res) {
         }
       });
   } catch (error) {
-    res.json ({success: false, message: 'something went wrong'});
+    res.json ({success: false, message: error.message});
   }
 });
 
