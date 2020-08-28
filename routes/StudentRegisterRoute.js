@@ -51,7 +51,7 @@ router.post("/register", upload.single("profileImage"), async (req, res) => {
               const response = { ...data };
               data.password = hashedPassword;
               userRef.push(data);
-              credit.push({ email: data.email, credit: 0 }); // push student credit
+              credit.push({ email: data.email, credit: 0, amountPaid: 0 }); // push student credit
               res.json({
                 response: response,
               });
