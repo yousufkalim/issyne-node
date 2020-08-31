@@ -1,7 +1,6 @@
 const express = require ('express');
 const router = express.Router ();
 const Firebase = require ('firebase-admin');
-const {param} = require ('./ChatRoute');
 
 router.post ('/report_teacher', async function (req, res) {
   var data = JSON.parse (JSON.stringify (req.body));
@@ -18,6 +17,7 @@ router.post ('/report_teacher', async function (req, res) {
     studentEmail: data.studentEmail,
     teacherEmail: data.teacherEmail,
     report: data.report,
+    chatKey:data.chatKey,
   };
   try {
     reportRef.push (param);

@@ -54,6 +54,9 @@ app.use('/',ChangePasswordRoute);
 const AdminPanelRoute = require('./routes/AdminPanelRoute');
 app.use('/admin_panel',AdminPanelRoute);
 
+const PackagesRoute = require('./routes/PackagesRoute');
+app.use('/',PackagesRoute);
+
 app.listen (3000, () => {
   console.log ('server started');
 });

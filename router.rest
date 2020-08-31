@@ -107,10 +107,40 @@ Content-Type: application/json
 
 
 ###
-GET http://192.168.18.33:3000/admin_panel/get_student
+GET http://192.168.18.17:3000/admin_panel/get_courses
+
+###
+POST http://192.168.18.17:3000/update_package
+Content-Type: application/json
+
+{    "id":"-MG3DmBNsUdobftDqb_z",
+     "coins": "15",
+     "price":"55"
+    
+}
+
+###
+POST http://192.168.18.17:3000/delete_package
+Content-Type: application/json
+
+{    "id":"-MG3DeYF1tweVVYSx7aP"    
+}
+
+###
+
+GET http://192.168.18.17:3000/get_package
 
 
+###
 
+POST http://192.168.18.17:3000/post_package
+Content-Type: application/json
+
+{
+     "coins": "5",
+     "price":"35"
+    
+}
 ###
 POST http://192.168.18.33:3000/forgot_password
 Content-Type: application/json
