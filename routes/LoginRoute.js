@@ -10,7 +10,6 @@ const teacherRef = db.ref ('teacher');
 
 router.post ('/login', async (req, res) => {
   console.log (JSON.stringify (req.body));
-
   var data = JSON.parse (JSON.stringify (req.body));
 
   studentRef

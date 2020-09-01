@@ -1,5 +1,6 @@
 const express = require ('express');
 const router = express.Router ();
+const bcrypt = require ('bcrypt');
 
 const Firebase = require ('firebase-admin');
 const db = Firebase.database ();
@@ -8,7 +9,7 @@ const teacherRef = db.ref ('teacher');
 const creditRef = db.ref ('credit');
 const ratingRef = db.ref ('rating');
 const reportTeacher = db.ref ('report_teacher');
-
+const adminRef = db.ref ('admin');
 const chatRef = db.ref ('chat');
 
 //============== Start Of Student Services ===================
@@ -359,20 +360,61 @@ async function getIssueReported (chatKey) {
       .orderByChild ('chatKey')
       .equalTo (chatKey)
       .once ('value', async function (snapshot) {
-        if(snapshot.val()!=null){
-          snapshot.forEach(function(childsnapshot){
+        if (snapshot.val () != null) {
+          snapshot.forEach (function (childsnapshot) {
             issue.isReported = true;
-            issue.comment = childsnapshot.val().report;
+            issue.comment = childsnapshot.val ().report;
           });
         }
-
       });
-      return issue;
+    return issue;
   } catch (error) {
-    console.log(error.message);
+    console.log (error.message);
     return issue;
   }
 }
 //============== End Of Courses Services    ==================
+
+//============== Admin Registartion Start   ===================
+
+router.post ('/register', async (req, res) => {
+  var data = JSON.parse (JSON.stringify (req.body));
+  if (data.email != undefined && data.password != undefined) {
+    const hashedPassword = await bcrypt.hash (data.password, 10);
+    try {
+      await adminRef.push ({email: data.email, password: hashedPassword});
+      res.json ({success: true});
+    } catch (error) {
+      res.json ({success: false, error: error.message});
+    }
+  }
+});
+
+router.post ('/login', async (req, res) => {
+  console.log (JSON.stringify (req.body));
+  var data = JSON.parse (JSON.stringify (req.body));
+
+  adminRef
+    .orderByChild ('email')
+    .equalTo (data.email)
+    .once ('value', async function (snapshot) {
+      if (snapshot.val () === null) {
+        res.json ({success: false, message: 'Email does not exist'});
+      } else {
+        const val = snapshot.val ();
+        var key = Object.keys (snapshot.val ())[0];
+
+        if (await bcrypt.compare (req.body.password, val[key].password)) {
+          res.json ({success: true});
+        } else
+          res.json ({
+            message: 'Invaid Credentials',
+            success: false,
+          });
+      }
+    });
+});
+
+//============== Admin Registartion End     ===================
 
 module.exports = router;

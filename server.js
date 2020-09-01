@@ -10,10 +10,18 @@ var defaultApp = admin.initializeApp ({
   databaseURL: 'https://issyne-c577d.firebaseio.com',
 });
 
-console.log (defaultApp.name);
 
 var bodyParser = require ('body-parser');
 const app = express ();
+
+
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "*");
+
+   next();
+});
+
 
 app.use (express.json ());
 app.use (bodyParser.urlencoded ({extended: true}));
