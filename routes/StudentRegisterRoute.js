@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const bcrypt = require("bcrypt");
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "./uploads/");
@@ -30,6 +31,8 @@ const db = Firebase.database();
 const userRef = db.ref("student");
 const teacherRef = db.ref("teacher");
 const credit = db.ref("credit");
+
+
 router.post("/register", upload.single("profileImage"), async (req, res) => {
   // router.post ('/register', async (req, res) => {
   var data = JSON.parse(JSON.stringify(req.body));
