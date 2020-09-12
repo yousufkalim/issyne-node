@@ -5,9 +5,13 @@ const reportTeacher = db.ref ('report_teacher');
 const creditRef = db.ref ('credit');
 const ratingRef = db.ref ('rating');
 const chatRef = db.ref ('chat');
+const bcrypt = require("bcrypt");
 
 module.exports = {
     getAll,
+    update,
+    getById,
+    delete:_delete,
 };
 
 
@@ -17,7 +21,9 @@ async function getAll (req, res) {
       if (snapshot.val () != null) {
         // Check if student table is not empty
         snapshot.forEach (function (childsnapshot) {
-          students.push (childsnapshot.val ());
+          var studentItem = childsnapshot.val();
+          studentItem.id = childsnapshot.key;
+          students.push(studentItem);
         });
       }
     });
@@ -53,6 +59,75 @@ async function getAll (req, res) {
     // sending all response
     res.json(students);
 
+}
+
+
+// getByID ==========================
+async function getById(req,res) {
+  studentRef
+    .orderByChild("email")
+    .equalTo(req.params.email)
+    .once("value", async function (snapshot) {
+      if (snapshot.val() === null) {
+        // the email does not exist
+        res.json({ success: false, message: "The email does not exist" });
+      } else {
+        snapshot.forEach(function (childsnapshot) {
+          res.json({success:true,user:childsnapshot.val()});
+        });
+      }
+    })
+}
+// update ============================
+async function update(res,req) {
+  const userParams = req.body;
+  studentRef
+    .orderByChild("email")
+    .equalTo(req.body.email)
+    .once("value", async function (snapshot) {
+      if (snapshot.val() === null) {
+        // the email does not exist
+        res.json({ success: false, message: "The email does not exist" });
+      } else {
+        console.log("in else");
+        snapshot.forEach(async function (childsnapshot) {
+          const clone = { ...childsnapshot.val() };
+          const updateRef = db.ref(
+            "student/" + childsnapshot.key
+          );
+          // stating update logic
+          const hashedPassword = await bcrypt.hash(userParams.password,10);
+          if(userParams.password !== clone.password){
+            clone.password = hashedPassword;
+          }
+          clone.username = userParams.username;
+          clone.firstName = userParams.firstName;
+          clone.lastName = userParams.lastName;
+          clone.dateOfBirth = userParams.dateOfBirth;
+          clone.phoneNumber = userParams.phoneNumber;
+          clone.educationLevel = userParams.educationLevel;
+          clone.city = userParams.city;
+          if(req.file !== undefined){
+            console.log("I am in file path",req.file.path)
+            clone.avatar = req.file.path;
+          }
+          await updateRef.update(clone);
+          console.log("after update");
+          res.json({status:true});
+          
+        });
+      }
+    });
+}
+// delete function/API call =========
+async function _delete(req,res) {
+  const studentRefDel = await Firebase.database ().ref ('student/' + req.params.id);
+  try {
+    await studentRefDel.remove ();
+    res.json ({success: true, message: 'package deleted'});
+  } catch (error) {
+    res.json ({success: false, message: error.message});
+  }
 }
 
 // function to get amount of sessions paid by the student

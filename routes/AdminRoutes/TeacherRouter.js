@@ -17,7 +17,9 @@ async function getAll (req, res) {
         // Check if student table is not empty
   
         snapshot.forEach (function (childsnapshot) {
-          teachers.push (childsnapshot.val ());
+          let teacherIs = childsnapshot.val();
+          teacherIs.id = childsnapshot.key;
+          teachers.push (teacherIs);
           teacherKeys.push (childsnapshot.key);
         });
       }

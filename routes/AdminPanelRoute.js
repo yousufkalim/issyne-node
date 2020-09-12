@@ -1,6 +1,30 @@
 const express = require ('express');
 const router = express.Router ();
+const multer = require("multer");
 const bcrypt = require ('bcrypt');
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, new Date().getTime() + file.originalname);
+  },
+});
+const fileFilter = (req, file, cb) => {
+  // if (file.mimeType === 'image/jpeg' || file.mimeType === 'image/png')
+  cb(null, true);
+  //else {
+  //cb (Error('Invalid File Format'), false);
+  // }
+};
+const upload = multer({
+  storage: storage,
+  // limits: {
+  //   fileSize: 1024 * 1024 * 5,
+  // },
+  fileFilter: fileFilter,
+});
 
 const Firebase = require ('firebase-admin');
 const db = Firebase.database ();
@@ -10,9 +34,14 @@ const adminRef = db.ref ('admin');
 const StudentService = require('./AdminRoutes/StudentRoutes');
 const TeacherService = require('./AdminRoutes/TeacherRouter');
 const CourseService = require('./AdminRoutes/CourseRoute');
+const { getById } = require('./AdminRoutes/StudentRoutes');
 //============== Start Of Student Services ===================
 
 router.get ('/get_student', (req, res) => StudentService.getAll(req,res));
+router.get('/get_student_data/:email/',(req,res)=> StudentService.getById(req,res));
+router.put('/update_student',upload.single("profileImage"),(req,res) => StudentService.update(res,req));
+router.delete('/delete_student/:id',(req,res)=>StudentService.delete(req,res));
+// router.delete('/delete_student',(req,res) => StudentService.delete(res,req))
 //============== End Of Student Services ===================
 
 //============== Start Of Teacher Services ==================

@@ -36,7 +36,11 @@ const credit = db.ref("credit");
 router.post("/register", upload.single("profileImage"), async (req, res) => {
   // router.post ('/register', async (req, res) => {
   var data = JSON.parse(JSON.stringify(req.body));
+  if(req.file !== undefined){
   data.avatar = req.file.path;
+  }else{
+    data.avatar = "";
+  }
   data.type = "student";
   userRef
     .orderByChild("email")

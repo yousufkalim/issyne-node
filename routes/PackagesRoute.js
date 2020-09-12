@@ -12,7 +12,7 @@ router.get ('/get_package', async function (req, res) {
     packageRef.once ('value', async function (snapshot) {
       if (snapshot.val () != null) {
         snapshot.forEach (function (childsnapshot) {
-          let data = {id: childsnapshot.key, data: childsnapshot.val ()};
+          let data = {id: childsnapshot.key, data: childsnapshot.val()};
           response.push (data);
         });
       }
@@ -32,7 +32,7 @@ router.post ('/post_package', async function (req, res) {
     packageRef.once ('value', async function (snapshot) {
       const params = {coins: data.coins, price: data.price};
       packageRef.push (params);
-      res.json (params);
+      res.json ({status:"200",params});
     });
   } catch (error) {
     res.json ({error: error.message});
@@ -44,7 +44,7 @@ router.post ('/post_package', async function (req, res) {
 router.post ('/update_package', async function (req, res) {
   try {
     var data = JSON.parse (JSON.stringify (req.body));
-    const packageRef = await Firebase.database ().ref ('packages/' + data.id);
+    const packageRef = await Firebase.database ().ref('packages/' + data.x);
     packageRef.once ('value', async function (snapshot) {
       const clone = {...snapshot.val ()};
       if (
@@ -69,8 +69,9 @@ router.post ('/update_package', async function (req, res) {
   }
 });
 
+
 //delete package
-router.post ('/delete_package', async function (req, res) {
+router.post('/delete_package', async function (req, res) {
   var data = JSON.parse (JSON.stringify (req.body));
   const packageRef = await Firebase.database ().ref ('packages/' + data.id);
   try {

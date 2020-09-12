@@ -1,5 +1,6 @@
 require ('dotenv').config ();
 const express = require ('express');
+const cors = require('cors');
 
 var admin = require ('firebase-admin');
 
@@ -15,6 +16,7 @@ var bodyParser = require ('body-parser');
 const app = express ();
 
 
+app.use(cors());
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "*");
@@ -26,8 +28,13 @@ app.use(function(req, res, next) {
 app.use (express.json ());
 app.use (bodyParser.urlencoded ({extended: true}));
 
-app.use (express.static ('uploads'));
-app.use (express.static ('chat_files'));
+
+const path = require('path');
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+app.use('/uploads',express.static(path.join(__dirname,'uploads')))
+app.use('/chat_files',express.static(path.join(__dirname,'chat_files')))
 
 const studentRouters = require ('./routes/StudentRegisterRoute');
 app.use ('/student', studentRouters);
