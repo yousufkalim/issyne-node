@@ -1,3 +1,6 @@
 node_modules
-chat_files
-uploads
+chat_files/*
+chat_files/*txt.txt
+
+uploads/*
+!uploads/*txt.txt
