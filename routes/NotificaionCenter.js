@@ -4,6 +4,8 @@ const Firebase = require ('firebase-admin');
 const notification_options = {
   priority: 'high',
   timeToLive: 60 * 60 * 24,
+  contentAvailable: true,
+  
 };
 const data = {peson:'12'};
 const strif = JSON.stringify(data);
@@ -32,8 +34,16 @@ router.post ('/push_notification', async function (req, res) {
     'data': req.body.data,
 
   };
-
-
+  // const notification_options = {
+  //   priority: 'high',
+  //   timeToLive: 60 * 60 * 24,
+  //   token: {
+  //     key: "../push_notificaiont_ios_auth_key/AuthKey_WRLA83HZ5V.p8",
+  //     keyId: "WRLA83HZ5V", //generated with the .p8 file
+  //     teamId: "NLW78DB7MD", // You can find it on https://developer.apple.com/account/#/membership
+  //   },
+  // };
+console.log(registrationToken)
   Firebase
     .messaging ()
     .sendToDevice (registrationToken, payload, options)

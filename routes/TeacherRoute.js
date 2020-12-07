@@ -4,6 +4,7 @@ const multer = require ('multer');
 const bcrypt = require ('bcrypt');
 
 const Firebase = require ('firebase-admin');
+const { route } = require('./ChatRoute');
 const db = Firebase.database ();
 const userRef = db.ref ('teacher');
 const studentRef = db.ref ('student');
@@ -50,6 +51,7 @@ router.post ('/get_teacher', async (req, res) => {
   
     }
   });
+
 
 router.post ('/change_status', async (req, res) => {
   try {

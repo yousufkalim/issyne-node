@@ -32,7 +32,7 @@ router.post ('/login', async (req, res) => {
                   const clone = {...childSnapshot.val ()};
                   const nodeRef = db.ref ('teacher/' + childSnapshot.key);
 
-                  clone.token = req.body.token.token;
+                  clone.token = req.body.token;
                   await nodeRef.update (clone);
                   res.json (childSnapshot);
                 });
@@ -52,7 +52,7 @@ router.post ('/login', async (req, res) => {
           snapshot.forEach (async function (childSnapshot) {
             const clone = {...childSnapshot.val ()};
             const nodeRef = db.ref ('student/' + childSnapshot.key);
-            clone.token = req.body.token.token;
+            clone.token = req.body.token;
             await nodeRef.update (clone);
             res.json (childSnapshot);
           });

@@ -136,7 +136,9 @@ function getMessageType (mimeType) {
 
   if (mimeType === MIME_TYPES.wav || mimeType === MIME_TYPES.xwav)
     return MEDIA_TYPES.audio;
-}
+    else
+    return null;
+  }
 
 router.post ('/send_message', upload.single ('media'), async function (
   req,
@@ -152,6 +154,12 @@ router.post ('/send_message', upload.single ('media'), async function (
     let messageType = MEDIA_TYPES.text;
     if (req.file != undefined) {
       messageType = getMessageType (req.file.mimetype);
+
+      // If mime type is invalid
+      if(messageType== null){
+         return res.json ({success: false});
+      }
+
 
       let path = req.file.path.split ('\\');
       message = req.file.filename;

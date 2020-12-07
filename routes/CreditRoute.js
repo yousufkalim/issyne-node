@@ -34,6 +34,34 @@ router.post("/get_credit", async function (req, res) {
   }
 });
 
+//Pre fill form
+router.post("/form", async function (req, res) {
+  try {
+    var data = JSON.parse(JSON.stringify(req.body));
+    const formRef = Firebase.database().ref("cardForm/");
+    formRef
+      .orderByChild("email")
+      .equalTo(data.email)
+      .once("value", async function (snapshot) {
+        if (snapshot.val() == null) {
+          await formRef.push(data);
+        } else {
+          let snapshotClone = { ...snapshot.val() };
+          snapshotClone = { ...data };
+          const key = Object.keys(snapshot.val())[0];
+
+          await Firebase.database()
+            .ref("cardForm/" + key)
+            .update(snapshotClone);
+        }
+        return res.json({ data: data, success: true });
+      });
+  } catch (error) {
+    console.log(error.message);
+    return res.json({ success: false });
+  }
+});
+
 // Add Credit to Account
 router.post("/post_credit", async function (req, res) {
   try {
@@ -51,7 +79,7 @@ router.post("/post_credit", async function (req, res) {
           };
 
           await creditRef.push(params);
-          res.json({ success: true, data: params });
+          return res.json({ success: true, data: params });
         } else {
           snapshot.forEach(async function (childSnapshot) {
             const clone = { ...childSnapshot.val() };
@@ -61,7 +89,7 @@ router.post("/post_credit", async function (req, res) {
               .ref("credit/" + childSnapshot.key)
               .update(clone);
 
-            res.json({ success: true, credit: clone.credit });
+            return res.json({ success: true, credit: clone.credit });
           });
 
           // if (creditUpdateRef != null)
