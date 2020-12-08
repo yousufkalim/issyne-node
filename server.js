@@ -43,6 +43,10 @@ app.use ('/teacher', teacherRegistrationRoute);
 
 const teacherRoute = require ('./routes/TeacherRoute');
 app.use ('/teacher', teacherRoute);
+
+const studentRoute = require ('./routes/StudentRoute');
+app.use ('/student', studentRoute);
+
 const reportTeacher = require ('./routes/ReportTeacherRoute');
 app.use ('/', reportTeacher);
 const loginRoute = require ('./routes/LoginRoute');

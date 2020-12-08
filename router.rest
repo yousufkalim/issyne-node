@@ -84,7 +84,7 @@ Content-Type: application/json
 
 
 ###
-POST http://192.168.8.102:3000/teacher/get_teacher
+POST http://192.168.8.102:3000/teacher/update_teacher
 Content-Type: application/json
 
 {
