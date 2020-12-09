@@ -32,13 +32,12 @@ const userRef = db.ref("student");
 const teacherRef = db.ref("teacher");
 const credit = db.ref("credit");
 
-
 router.post("/register", upload.single("profileImage"), async (req, res) => {
   // router.post ('/register', async (req, res) => {
   var data = JSON.parse(JSON.stringify(req.body));
-  if(req.file !== undefined){
-  data.avatar = req.file.path;
-  }else{
+  if (req.file !== undefined) {
+    data.avatar = req.file.path;
+  } else {
     data.avatar = "";
   }
   data.type = "student";
@@ -57,6 +56,7 @@ router.post("/register", upload.single("profileImage"), async (req, res) => {
               const hashedPassword = await bcrypt.hash(req.body.password, 10);
               const response = { ...data };
               data.password = hashedPassword;
+              data.isSocial = false;
               userRef.push(data);
               credit.push({ email: data.email, credit: 0, amountPaid: 0 }); // push student credit
               res.json({
@@ -66,41 +66,49 @@ router.post("/register", upload.single("profileImage"), async (req, res) => {
           });
       } else res.json({ message: "Email Already Exists" });
     });
-
-  // console.log(req.body.password);
-  //    Student.find ({email: req.body.email})
-  //    .exec ()
-  //    .then (async doc => {
-  //      if (doc.length === 0) {
-  //        const hashedPassword = await bcrypt.hash (req.body.password, 10);
-  //        const student = new Student ({
-  //          email: req.body.email,
-  //          password: hashedPassword,
-  //          firstName: req.body.firstName,
-  //          lastName: req.body.lastName,
-  //          dateOfBirth: req.body.dateOfBirth,
-  //          educationLevel: req.body.educationLevel,
-  //          city: req.body.city,
-  //          phoneNumber: req.body.phoneNumber,
-  //          username: req.body.username,
-  //          avatar: req.file.path,
-  //        });
-
-  //        try {
-  //          const newStudent = await student.save ();
-
-  //          res.json (newStudent);
-  //          console.log ('response');
-  //        } catch (error) {
-  //          console.log (error.message);
-
-  //          res.json ({message: error.message + 'From server'});
-  //        }
-  //      } else res.json ({message: 'Email Already Registered'});
-  //    })
-  //    .catch (err => console.log(err.message)
-  //      //res.json ({message: err.message})
-  //      );
 });
+
+router.post(
+  "/register_social",
+  upload.single("profileImage"),
+  async (req, res) => {
+    console.log("\n\n\n\n\n HERE \n\n\n\n\n\n");
+
+    // router.post ('/register', async (req, res) => {
+    var data = JSON.parse(JSON.stringify(req.body));
+    console.log(JSON.stringify(data, null, 2));
+    if (req.file !== undefined) {
+      data.avatar = req.file.path;
+    } else {
+      data.avatar = "";
+    }
+    data.type = "student";
+    userRef
+      .orderByChild("email")
+      .equalTo(data.email)
+      .once("value", async function (snapshot) {
+        if (snapshot.val() === null) {
+          // check if email exists on student
+          teacherRef
+            .orderByChild("email")
+            .equalTo(data.email)
+            .once("value", async function (snapshot) {
+              if (snapshot.val() === null) {
+                // check if email exists on teacher
+                const hashedPassword = await bcrypt.hash(req.body.password, 10);
+                const response = { ...data };
+                response.password = hashedPassword;
+                response.isSocial = true;
+                userRef.push(response);
+                credit.push({ email: data.email, credit: 0, amountPaid: 0 }); // push student credit
+                res.json({
+                  response: response,
+                });
+              } else res.json({ message: "Email Already Exists" });
+            });
+        } else res.json({ message: "Email Already Exists" });
+      });
+  }
+);
 
 module.exports = router;

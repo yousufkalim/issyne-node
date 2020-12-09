@@ -29,6 +29,13 @@ router.post("/forgot_password", async function (req, res) {
               snapshot.forEach(async function (childsnapshot) {
                 var randomPassword = Math.random().toString(36).slice(-8);
                 const hashedPassword = await bcrypt.hash(randomPassword, 10);
+                if (childsnapshot.val().isSocial) {
+                  return res.json({
+                    success: false,
+                    message:
+                      "Update Failed. This email is registered as a social account",
+                  });
+                }
                 const clone = { ...childsnapshot.val() };
                 clone.password = hashedPassword;
                 const updatePasswordRef = db.ref(
@@ -45,6 +52,13 @@ router.post("/forgot_password", async function (req, res) {
         snapshot.forEach(async function (childsnapshot) {
           var randomPassword = Math.random().toString(36).slice(-8);
           const hashedPassword = await bcrypt.hash(randomPassword, 10);
+          if (childsnapshot.val().isSocial) {
+            return res.json({
+              success: false,
+              message:
+                "Update Failed. This email is registered as a social account",
+            });
+          }
           const clone = { ...childsnapshot.val() };
           clone.password = hashedPassword;
           const updatePasswordRef = db.ref("teacher/" + childsnapshot.key);
