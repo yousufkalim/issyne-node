@@ -58,15 +58,22 @@ router.post("/get", async function (req, res) {
   var data = JSON.parse(JSON.stringify(req.body));
   try {
     const dataArray = [];
-    chatRef.once("value", function (snapshot) {
+    chatRef.once("value", async function (snapshot) {
       // console.log(snapshot.val())
-      if(snapshot.val()==null){
-        res.json(dataArray)
+
+      if (snapshot.val() == null) {
+        res.json(dataArray);
       }
-      snapshot.forEach(async function (childSnapShot) {
+      let childs = [];
+      snapshot.forEach(function (childSnapShot) {
+        const childSnapshotClone = { ...childSnapShot.val() };
+        childSnapshotClone.key = childSnapShot.key;
+        childs.push(childSnapshotClone);
+      });
+      for (const childSnapShot of childs) {
         if (data.type === "student") {
-          if (childSnapShot.val().studentEmail == data.id) {
-            const childSnapshotClone = { ...childSnapShot.val() };
+          if (childSnapShot.studentEmail == data.id) {
+            const childSnapshotClone = { ...childSnapShot };
             childSnapshotClone.key = childSnapShot.key;
 
             if (childSnapshotClone.teacherEmail != undefined) {
@@ -79,15 +86,14 @@ router.post("/get", async function (req, res) {
               await teacherVal.forEach((val) => {
                 teacherClone = val;
               });
-              childSnapshotClone.teacher =  teacherVal;
+              childSnapshotClone.teacher = teacherVal;
             }
-
             dataArray.push(childSnapshotClone);
           }
-          res.json(dataArray);
+        //  res.json(dataArray);
         } else {
-          if (childSnapShot.val().teacherEmail == data.id) {
-            const childSnapshotClone = { ...childSnapShot.val() };
+          if (childSnapShot.teacherEmail == data.id) {
+            const childSnapshotClone = { ...childSnapShot };
             childSnapshotClone.key = childSnapShot.key;
 
             if (childSnapshotClone.studentEmail != undefined) {
@@ -105,9 +111,57 @@ router.post("/get", async function (req, res) {
 
             dataArray.push(childSnapshotClone);
           }
-          res.json(dataArray);
+        //  res.json(dataArray);
         }
-      });
+      }
+      res.json(dataArray);
+      // snapshot.forEach(async function (childSnapShot) {
+      //  // console.log(JSON.stringify(childSnapShot.val(),null,2))
+
+      //   if (data.type === "student") {
+
+      //     if (childSnapShot.val().studentEmail == data.id) {
+      //       const childSnapshotClone = { ...childSnapShot.val() };
+      //       childSnapshotClone.key = childSnapShot.key;
+
+      //       if (childSnapshotClone.teacherEmail != undefined) {
+      //         const teacherVal = await db
+      //           .ref("teacher")
+      //           .orderByChild("email")
+      //           .equalTo(childSnapshotClone.teacherEmail)
+      //           .once("value");
+      //         let teacherClone = null;
+      //         await teacherVal.forEach((val) => {
+      //           teacherClone = val;
+      //         });
+      //         childSnapshotClone.teacher =  teacherVal;
+      //       }
+      //       dataArray.push(childSnapshotClone);
+      //     }
+      //     res.json(dataArray);
+      //   } else {
+      //     if (childSnapShot.val().teacherEmail == data.id) {
+      //       const childSnapshotClone = { ...childSnapShot.val() };
+      //       childSnapshotClone.key = childSnapShot.key;
+
+      //       if (childSnapshotClone.studentEmail != undefined) {
+      //         const studentVal = await db
+      //           .ref("student")
+      //           .orderByChild("email")
+      //           .equalTo(childSnapshotClone.studentEmail)
+      //           .once("value");
+      //         let studentClone = null;
+      //         await studentVal.forEach((val) => {
+      //           studentClone = val;
+      //         });
+      //         childSnapshotClone.student = studentClone;
+      //       }
+
+      //       dataArray.push(childSnapshotClone);
+      //     }
+      //     res.json(dataArray);
+      //   }
+      // });
     });
   } catch (error) {}
 
