@@ -41,6 +41,13 @@ router.post("/register", upload.single("profileImage"), async (req, res) => {
     data.avatar = "";
   }
   data.type = "student";
+  data.card = {
+    card_num: 0,
+    cvc: 0,
+    expMonth: 0,
+    expYear: 0,
+  };
+  console.log(data);
   userRef
     .orderByChild("email")
     .equalTo(data.email)
@@ -59,12 +66,19 @@ router.post("/register", upload.single("profileImage"), async (req, res) => {
               data.isSocial = false;
               userRef.push(data);
               credit.push({ email: data.email, credit: 0, amountPaid: 0 }); // push student credit
-              res.json({
+              console.log("Response creation", response);
+              res.status(200).json({
                 response: response,
               });
             } else res.json({ message: "Email Already Exists" });
+          })
+          .catch((err) => {
+            console.log("Error", err);
           });
       } else res.json({ message: "Email Already Exists" });
+    })
+    .catch((err) => {
+      console.log("Error", err);
     });
 });
 

@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Firebase = require("firebase-admin");
 const { param } = require("./ChatRoute");
+const moment = require("moment");
 
 // Get Credit From User
 router.post("/get_credit", async function (req, res) {
@@ -38,22 +39,50 @@ router.post("/get_credit", async function (req, res) {
 router.post("/form", async function (req, res) {
   try {
     var data = JSON.parse(JSON.stringify(req.body));
+    const expDate = {
+      day: parseInt(moment(data.expiration_date).format("DD")),
+      month: parseInt(moment(data.expiration_date).format("MM")),
+      year: parseInt(moment(data.expiration_date).format("YYYY")),
+    };
     const formRef = Firebase.database().ref("cardForm/");
     formRef
       .orderByChild("email")
       .equalTo(data.email)
       .once("value", async function (snapshot) {
-        if (snapshot.val() == null) {
+        if (snapshot.val() === null) {
           await formRef.push(data);
         } else {
           let snapshotClone = { ...snapshot.val() };
           snapshotClone = { ...data };
           const key = Object.keys(snapshot.val())[0];
-
           await Firebase.database()
             .ref("cardForm/" + key)
             .update(snapshotClone);
+          await Firebase.database()
+            .ref("student/")
+            .orderByChild("email")
+            .equalTo(data.email)
+            .once("value", async function (snapshotStudent) {
+              const keyStudent = Object.keys(snapshotStudent.val())[0];
+              const student = Object.keys(snapshotStudent.val());
+              console.log(("student", student));
+              console.log(keyStudent);
+              await Firebase.database()
+                .ref("student/" + keyStudent)
+                .update({
+                  card: {
+                    card_num: data.card_num,
+                    cvc: data.ccv,
+                    expMonth: expDate.month,
+                    expYear: expDate.year,
+                  },
+                });
+            });
+          // if (snapshot.val() != null) {
+          //   let hashedPassword = null;
+          // }
         }
+
         return res.json({ data: data, success: true });
       });
   } catch (error) {

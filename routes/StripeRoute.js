@@ -6,20 +6,6 @@ const stripe = require("stripe")(
 );
 
 router.post("/stripe", async function (req, res) {
-  // console.log("AMOUINT", req.body.amount);
-  // stripe.charges
-  //   .create({
-  //     amount: req.body.amount,
-  //     currency: req.body.currency,
-  //     source: "tok_mastercard", // for testing purpose in case of release pass token here
-  //   })
-  //   .then((charge) => {
-  //     res.json({ success: true, charge });
-  //   })
-  //   .catch((error) => {
-  //     res.json({ success: false, message: error.message });
-  //   });
-
   try {
     const name = req.body.name;
     const email = req.body.email;
