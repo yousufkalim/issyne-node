@@ -3,6 +3,9 @@ const router = express.Router();
 const Firebase = require("firebase-admin");
 const { param } = require("./ChatRoute");
 const moment = require("moment");
+const stripe = require("stripe")(
+  "STRIPE_TEST_KEY_REDACTED"
+);
 
 // Get Credit From User
 router.post("/get_credit", async function (req, res) {
@@ -75,6 +78,58 @@ router.post("/form", async function (req, res) {
                     cvc: data.ccv,
                     expMonth: expDate.month,
                     expYear: expDate.year,
+                  },
+                });
+            });
+          // if (snapshot.val() != null) {
+          //   let hashedPassword = null;
+          // }
+        }
+
+        return res.json({ data: data, success: true });
+      });
+  } catch (error) {
+    console.log(error.message);
+    return res.json({ success: false });
+  }
+});
+
+///////////////////////BANK INFO//////////////////////////////
+router.post("/bankinfo", async function (req, res) {
+  try {
+    var data = JSON.parse(JSON.stringify(req.body));
+
+    const formRef = Firebase.database().ref("teacher/");
+    console.log("dataaaaa", data.email);
+    formRef
+      .orderByChild("email")
+      .equalTo(data.email)
+      .once("value", async function (snapshot) {
+        if (snapshot.val() === null) {
+          await formRef.push(data);
+        } else {
+          let snapshotClone = { ...snapshot.val() };
+          snapshotClone = { ...data };
+          const key = Object.keys(snapshot.val())[0];
+          await Firebase.database()
+            .ref("cardForm/" + key)
+            .update(snapshotClone);
+          await Firebase.database()
+            .ref("teacher/")
+            .orderByChild("email")
+            .equalTo(data.email)
+            .once("value", async function (snapshotTeacher) {
+              const keyTeacher = Object.keys(snapshotTeacher.val())[0];
+              const teacher = Object.keys(snapshotTeacher.val());
+              console.log(("teacher", teacher));
+              console.log(keyTeacher);
+              await Firebase.database()
+                .ref("teacher/" + keyTeacher)
+                .update({
+                  bank: {
+                    bankname: data.bankname,
+                    iban: data.iban,
+                    dob: data.dob,
                   },
                 });
             });
@@ -165,4 +220,78 @@ router.post("/deduct_credit", async function (req, res) {
   }
 });
 
+router.post("/addBank", async function (req, res) {
+  try {
+    var teacher = req.body;
+    // const newDOB = {
+    //   day: parseInt(moment(teacher.dateOfBirth).format("DD")),
+    //   month: parseInt(moment(teacher.dateOfBirth).format("MM")),
+    //   year: parseInt(moment(teacher.dateOfBirth).format("YYYY")),
+    // };
+    console.log("DATA FROM ADD BANK", teacher);
+
+    const token = await stripe.tokens.create({
+      account: {
+        tos_shown_and_accepted: true,
+        business_type: "individual",
+        individual: {
+          email: teacher.email,
+          first_name: teacher.firstName,
+          last_name: teacher.lastName,
+
+          phone: teacher.phoneNumber,
+          dob: {
+            day: 01,
+            month: 01,
+            year: 1901,
+          },
+
+          address: {
+            line1: teacher.address,
+            postal_code: "41200",
+            city: "test",
+            country: "FR",
+          },
+          // verification: {
+          //   additional_document: {
+          //     back: fileBack.id,
+          //     details: "Use document for front and back",
+          //     front: fileFront.id,
+          //   },
+          // },
+        },
+      },
+    });
+    console.log("Token", token);
+
+    const account = await stripe.account.create({
+      type: "custom",
+      country: "FR",
+      account_token: token.id,
+      email: teacher.email,
+      business_profile: {
+        name: teacher.firstName,
+        mcc: "7011",
+        url: "http://google.com",
+      },
+      capabilities: {
+        card_payments: { requested: true },
+        transfers: { requested: true },
+      },
+      external_account: {
+        object: "bank_account",
+        account_number: teacher.bank.iban,
+        //test account_number: "FR1420041010050500013M02606",
+        bank_name: teacher.bank.bankName,
+        country: "FR",
+        currency: "eur",
+      },
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.log("Add Bank", error);
+    res.json({ success: false });
+  }
+});
 module.exports = router;

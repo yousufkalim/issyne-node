@@ -102,7 +102,7 @@ router.post(
 
                 console.log("here");
               } else
-               return await res.json({
+                return await res.json({
                   success: false,
                   message: "Incorrect Password",
                 });
