@@ -1,9 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Firebase = require("firebase-admin");
-const stripe = require("stripe")(
-  "STRIPE_TEST_KEY_REDACTED"
-);
+const stripe = require("stripe")(process.env.STRIPE_KEY);
 
 router.post("/stripe", async function (req, res) {
   try {
@@ -18,7 +16,7 @@ router.post("/stripe", async function (req, res) {
     // const token = req.body.token;
     // const amount = 20;
 
-    console.log("TOKEN", token);
+    // console.log("TOKEN", token);
 
     const customer = await stripe.customers.create({
       name: name,
@@ -26,7 +24,7 @@ router.post("/stripe", async function (req, res) {
       // currency: "eur",
       source: token.tokenId,
     });
-    console.log("CUSTOMER", customer);
+    // console.log("CUSTOMER", customer);
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amount,
       currency: "eur",
@@ -35,7 +33,7 @@ router.post("/stripe", async function (req, res) {
       payment_method: token.card.cardId,
       confirm: true,
     });
-    console.log("Payment Intent", paymentIntent);
+    console.log("paymentIntent.status", paymentIntent.status);
 
     if (paymentIntent.status !== "succeeded") {
       res.json({ success: false, message: error.message });

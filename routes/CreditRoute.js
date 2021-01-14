@@ -3,9 +3,7 @@ const router = express.Router();
 const Firebase = require("firebase-admin");
 const { param } = require("./ChatRoute");
 const moment = require("moment");
-const stripe = require("stripe")(
-  "STRIPE_TEST_KEY_REDACTED"
-);
+const stripe = require("stripe")(process.env.STRIPE_KEY);
 
 // Get Credit From User
 router.post("/get_credit", async function (req, res) {
@@ -67,9 +65,6 @@ router.post("/form", async function (req, res) {
             .equalTo(data.email)
             .once("value", async function (snapshotStudent) {
               const keyStudent = Object.keys(snapshotStudent.val())[0];
-              const student = Object.keys(snapshotStudent.val());
-              console.log(("student", student));
-              console.log(keyStudent);
               await Firebase.database()
                 .ref("student/" + keyStudent)
                 .update({
@@ -80,13 +75,17 @@ router.post("/form", async function (req, res) {
                     expYear: expDate.year,
                   },
                 });
+              return res.json({
+                data: {
+                  card_num: data.card_num,
+                  cvc: data.ccv,
+                  expMonth: expDate.month,
+                  expYear: expDate.year,
+                },
+                success: true,
+              });
             });
-          // if (snapshot.val() != null) {
-          //   let hashedPassword = null;
-          // }
         }
-
-        return res.json({ data: data, success: true });
       });
   } catch (error) {
     console.log(error.message);
@@ -294,4 +293,5 @@ router.post("/addBank", async function (req, res) {
     res.json({ success: false });
   }
 });
+
 module.exports = router;

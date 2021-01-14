@@ -9,7 +9,6 @@ const studentRef = db.ref("student");
 const teacherRef = db.ref("teacher");
 
 router.post("/login", async (req, res) => {
-  console.log(JSON.stringify(req.body));
   var data = JSON.parse(JSON.stringify(req.body));
 
   studentRef
@@ -66,7 +65,6 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/login_social", async (req, res) => {
-  console.log(JSON.stringify(req.body));
   var data = JSON.parse(JSON.stringify(req.body));
 
   studentRef
@@ -116,7 +114,7 @@ router.post("/login_social", async (req, res) => {
           console.log("compared");
           snapshot.forEach(async function (childSnapshot) {
             const clone = { ...childSnapshot.val() };
-            console.log(JSON.stringify(childSnapshot.key,null,2))
+            console.log(JSON.stringify(childSnapshot.key, null, 2));
             const nodeRef = db.ref("student/" + childSnapshot.key);
             clone.token = req.body.token;
             await nodeRef.update(clone);
