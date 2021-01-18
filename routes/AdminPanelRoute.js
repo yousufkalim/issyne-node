@@ -1,7 +1,7 @@
-const express = require ('express');
-const router = express.Router ();
+const express = require("express");
+const router = express.Router();
 const multer = require("multer");
-const bcrypt = require ('bcrypt');
+const bcrypt = require("bcrypt");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -26,33 +26,39 @@ const upload = multer({
   fileFilter: fileFilter,
 });
 
-const Firebase = require ('firebase-admin');
-const db = Firebase.database ();
-const adminRef = db.ref ('admin');
+const Firebase = require("firebase-admin");
+const db = Firebase.database();
+const adminRef = db.ref("admin");
 
 // get all student API Functions
-const StudentService = require('./AdminRoutes/StudentRoutes');
-const TeacherService = require('./AdminRoutes/TeacherRouter');
-const CourseService = require('./AdminRoutes/CourseRoute');
-const { getById } = require('./AdminRoutes/StudentRoutes');
+const StudentService = require("./AdminRoutes/StudentRoutes");
+const TeacherService = require("./AdminRoutes/TeacherRouter");
+const CourseService = require("./AdminRoutes/CourseRoute");
+const { getById } = require("./AdminRoutes/StudentRoutes");
 //============== Start Of Student Services ===================
 
-router.get ('/get_student', (req, res) => StudentService.getAll(req,res));
-router.get('/get_student_data/:email/',(req,res)=> StudentService.getById(req,res));
-router.put('/update_student',upload.single("profileImage"),(req,res) => StudentService.update(res,req));
-router.delete('/delete_student/:id',(req,res)=>StudentService.delete(req,res));
+router.get("/get_student", (req, res) => StudentService.getAll(req, res));
+router.get("/get_student_data/:email/", (req, res) =>
+  StudentService.getById(req, res)
+);
+router.put("/update_student", upload.single("profileImage"), (req, res) =>
+  StudentService.update(res, req)
+);
+router.delete("/delete_student/:id", (req, res) =>
+  StudentService.delete(req, res)
+);
 // router.delete('/delete_student',(req,res) => StudentService.delete(res,req))
 //============== End Of Student Services ===================
 
 //============== Start Of Teacher Services ==================
 
-router.get ('/get_teacher', (req, res) => TeacherService.getAll(req,res));
+router.get("/get_teacher", (req, res) => TeacherService.getAll(req, res));
 
 //============== End Of Teacher Services   ==================
 
 //============== Start Of Courses Services    ==================
 
-router.get ('/get_courses', (req, res) => CourseService.getAll(req,res));
+router.get("/get_courses", (req, res) => CourseService.getAll(req, res));
 
 //============== End Of Courses Services    ==================
 
@@ -73,27 +79,26 @@ router.get ('/get_courses', (req, res) => CourseService.getAll(req,res));
 // });
 // =====================================================
 
-
-router.post ('/login', async (req, res) => {
-  console.log (JSON.stringify (req.body));
-  var data = JSON.parse (JSON.stringify (req.body));
+router.post("/login", async (req, res) => {
+  console.log(JSON.stringify(req.body));
+  var data = JSON.parse(JSON.stringify(req.body));
 
   adminRef
-    .orderByChild ('email')
-    .equalTo (data.email)
-    .once ('value', async function (snapshot) {
-      if (snapshot.val () === null) {
-        res.json ({success: false, message: 'Email does not exist'});
+    .orderByChild("email")
+    .equalTo(data.email)
+    .once("value", async function (snapshot) {
+      if (snapshot.val() === null) {
+        res.json({ success: false, message: "Email does not exist" });
       } else {
-        const val = snapshot.val ();
-        var key = Object.keys (snapshot.val ())[0];
+        const val = snapshot.val();
+        var key = Object.keys(snapshot.val())[0];
 
-        if (await bcrypt.compare (req.body.password, val[key].password)) {
-          console.log(val[key])
-          res.json ({success: true,user:val[key]});
+        if (await bcrypt.compare(req.body.password, val[key].password)) {
+          console.log(val[key]);
+          res.json({ success: true, user: val[key] });
         } else
-          res.json ({
-            message: 'Invaid Credentials',
+          res.json({
+            message: "Invaid Credentials",
             success: false,
           });
       }

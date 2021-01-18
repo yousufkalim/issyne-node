@@ -33,7 +33,7 @@ router.post("/stripe", async function (req, res) {
       payment_method: token.card.cardId,
       confirm: true,
     });
-    console.log("paymentIntent.status", paymentIntent.status);
+    // console.log("paymentIntent.status", paymentIntent.status);
 
     if (paymentIntent.status !== "succeeded") {
       res.json({ success: false, message: error.message });

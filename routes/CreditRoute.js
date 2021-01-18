@@ -45,6 +45,8 @@ router.post("/form", async function (req, res) {
       month: parseInt(moment(data.expiration_date).format("MM")),
       year: parseInt(moment(data.expiration_date).format("YYYY")),
     };
+
+    // console.log("DATAE", data, expDate);
     const formRef = Firebase.database().ref("cardForm/");
     formRef
       .orderByChild("email")
@@ -71,6 +73,7 @@ router.post("/form", async function (req, res) {
                   card: {
                     card_num: data.card_num,
                     cvc: data.ccv,
+                    ExpDate: data.expiration_date,
                     expMonth: expDate.month,
                     expYear: expDate.year,
                   },
@@ -79,6 +82,7 @@ router.post("/form", async function (req, res) {
                 data: {
                   card_num: data.card_num,
                   cvc: data.ccv,
+                  ExpDate: data.expiration_date,
                   expMonth: expDate.month,
                   expYear: expDate.year,
                 },
@@ -99,7 +103,7 @@ router.post("/bankinfo", async function (req, res) {
     var data = JSON.parse(JSON.stringify(req.body));
 
     const formRef = Firebase.database().ref("teacher/");
-    console.log("dataaaaa", data.email);
+    // console.log("dataaaaa", data.email);
     formRef
       .orderByChild("email")
       .equalTo(data.email)
@@ -120,8 +124,8 @@ router.post("/bankinfo", async function (req, res) {
             .once("value", async function (snapshotTeacher) {
               const keyTeacher = Object.keys(snapshotTeacher.val())[0];
               const teacher = Object.keys(snapshotTeacher.val());
-              console.log(("teacher", teacher));
-              console.log(keyTeacher);
+              // console.log(("teacher", teacher));
+              // console.log(keyTeacher);
               await Firebase.database()
                 .ref("teacher/" + keyTeacher)
                 .update({
@@ -149,6 +153,7 @@ router.post("/bankinfo", async function (req, res) {
 router.post("/post_credit", async function (req, res) {
   try {
     var data = JSON.parse(JSON.stringify(req.body));
+    console.log("DATA", data);
     const creditRef = await Firebase.database().ref("credit");
     creditRef
       .orderByChild("email")
@@ -193,7 +198,7 @@ router.post("/deduct_credit", async function (req, res) {
       .equalTo(data.email)
       .once("value", async function (snapshot) {
         if (snapshot.val() === null) {
-          console.log("inside if");
+          // console.log("inside if");
           const params = {
             email: data.email,
           };
@@ -227,7 +232,7 @@ router.post("/addBank", async function (req, res) {
     //   month: parseInt(moment(teacher.dateOfBirth).format("MM")),
     //   year: parseInt(moment(teacher.dateOfBirth).format("YYYY")),
     // };
-    console.log("DATA FROM ADD BANK", teacher);
+    // console.log("DATA FROM ADD BANK", teacher);
 
     const token = await stripe.tokens.create({
       account: {
@@ -261,7 +266,7 @@ router.post("/addBank", async function (req, res) {
         },
       },
     });
-    console.log("Token", token);
+    // console.log("Token", token);
 
     const account = await stripe.account.create({
       type: "custom",

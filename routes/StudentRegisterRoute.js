@@ -44,10 +44,11 @@ router.post("/register", upload.single("profileImage"), async (req, res) => {
   data.card = {
     card_num: 0,
     cvc: 0,
+    ExpDate: 0,
     expMonth: 0,
     expYear: 0,
   };
-  console.log(data);
+  // console.log(data);
   userRef
     .orderByChild("email")
     .equalTo(data.email)
@@ -66,7 +67,7 @@ router.post("/register", upload.single("profileImage"), async (req, res) => {
               data.isSocial = false;
               userRef.push(data);
               credit.push({ email: data.email, credit: 0, amountPaid: 0 }); // push student credit
-              console.log("Response creation", response);
+              // console.log("Response creation", response);
               res.status(200).json({
                 response: response,
               });
@@ -86,7 +87,7 @@ router.post(
   "/register_social",
   upload.single("profileImage"),
   async (req, res) => {
-    console.log("\n\n\n\n\n HERE \n\n\n\n\n\n");
+    // console.log("\n\n\n\n\n HERE \n\n\n\n\n\n");
 
     // router.post ('/register', async (req, res) => {
     var data = JSON.parse(JSON.stringify(req.body));
