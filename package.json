@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "devStart": "nodemon server.js"
+    "devStart": "nodemon server.js",
+    "deploy": "git pull origin master && npm install && pm2 restart 5"
   },
   "author": "",
   "license": "ISC",
