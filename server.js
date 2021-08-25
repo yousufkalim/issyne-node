@@ -74,6 +74,6 @@ app.use("/admin_panel", AdminPanelRoute);
 const PackagesRoute = require("./routes/PackagesRoute");
 app.use("/", PackagesRoute);
 
-app.listen(5000, () => {
+app.listen(process.env.PORT || 5000, () => {
   console.log("server started");
 });
