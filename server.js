@@ -5,11 +5,11 @@ const morgan = require("morgan");
 
 var admin = require("firebase-admin");
 
-var serviceAccount = require("./issyne-383fb-firebase-adminsdk-npzf4-97f3eb7fd3.json");
+var serviceAccount = require("./issyne-c577d-firebase-adminsdk-a3244-12e7080bf4.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://issyne-383fb-default-rtdb.firebaseio.com",
+  databaseURL: "https://issyne-c577d.firebaseio.com",
 });
 
 var bodyParser = require("body-parser");
