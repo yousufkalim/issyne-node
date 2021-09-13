@@ -77,11 +77,23 @@ router.post("/get", async function (req, res) {
             childSnapshotClone.key = childSnapShot.key;
 
             if (childSnapshotClone.teacherEmail != undefined) {
+              let teacher = await db  // append teacher photo with chat db
+              .ref("teacher")
+              .orderByChild("email")
+              .equalTo(childSnapshotClone.teacherEmail)
+              .on("child_added", async function (snapshot, prevChildKey) {
+                let photo=snapshot.val();
+                childSnapshotClone.teacherAvatar=photo.avatar;
+              });
+
+
               const teacherVal = await db
                 .ref("teacher")
                 .orderByChild("email")
                 .equalTo(childSnapshotClone.teacherEmail)
                 .once("value");
+               
+           
               let teacherClone = null;
               await teacherVal.forEach((val) => {
                 teacherClone = val;
@@ -90,7 +102,7 @@ router.post("/get", async function (req, res) {
             }
             dataArray.push(childSnapshotClone);
           }
-        //  res.json(dataArray);
+          //  res.json(dataArray);
         } else {
           if (childSnapShot.teacherEmail == data.id) {
             const childSnapshotClone = { ...childSnapShot };
@@ -111,7 +123,7 @@ router.post("/get", async function (req, res) {
 
             dataArray.push(childSnapshotClone);
           }
-        //  res.json(dataArray);
+          //  res.json(dataArray);
         }
       }
       res.json(dataArray);
@@ -163,7 +175,7 @@ router.post("/get", async function (req, res) {
       //   }
       // });
     });
-  } catch (error) {}
+  } catch (error) { }
 
   // try {
   //   chatRef

@@ -126,7 +126,7 @@ router.post(
         });
     } catch (error) {
       console.log(error.message);
-      res.json({ message: "All Fields Are Required" });
+      res.json({ message: error.message });
     }
   }
 );

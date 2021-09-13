@@ -93,7 +93,7 @@ router.post("/form", async function (req, res) {
       });
   } catch (error) {
     console.log(error.message);
-    return res.json({ success: false });
+    return res.json({ success: false,message:error.message });
   }
 });
 
@@ -123,9 +123,7 @@ router.post("/bankinfo", async function (req, res) {
             .equalTo(data.email)
             .once("value", async function (snapshotTeacher) {
               const keyTeacher = Object.keys(snapshotTeacher.val())[0];
-              const teacher = Object.keys(snapshotTeacher.val());
-              // console.log(("teacher", teacher));
-              // console.log(keyTeacher);
+          
               await Firebase.database()
                 .ref("teacher/" + keyTeacher)
                 .update({
@@ -153,7 +151,7 @@ router.post("/bankinfo", async function (req, res) {
 router.post("/post_credit", async function (req, res) {
   try {
     var data = JSON.parse(JSON.stringify(req.body));
-    console.log("DATA", data);
+  
     const creditRef = await Firebase.database().ref("credit");
     creditRef
       .orderByChild("email")

@@ -100,7 +100,7 @@ router.post (
 
      
     } catch (error) {
-      res.json ({message: 'All Fields Are Required'});
+      res.json ({message: error.message});
     }
   }
 );
