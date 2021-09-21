@@ -3,7 +3,9 @@ const router = express.Router();
 const Firebase = require("firebase-admin");
 var nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
-
+const handlebars = require("handlebars");
+const fs = require("fs");
+const path = require("path");
 const db = Firebase.database();
 
 const teacherDb = db.ref("teacher");
@@ -71,24 +73,36 @@ router.post("/forgot_password", async function (req, res) {
 
 function sendEmail(email, password, res) {
   var transporter = nodemailer.createTransport({
-    service: "gmail",
+    service: process.env.MAILER_HOST,
     auth: {
-      user: "yousaf.falcon321@gmail.com",
-      pass: "yousafFalcon123",
+      user: process.env.MAILER_SENDER_EMAIL,
+      pass: process.env.MAILER_PASSWORD,
     },
   });
 
-  var mailOptions = {
-    from: "yousaf.falcon321@gmail.com",
-    to: "yousaf.butt25@yahoo.com",
-    subject: "Your New Password Is",
-    text: password,
-  };
+  const filePath = path.join(
+    __dirname,
+    "../html_templates/requestResetPassword.html"
+  );
 
+  const source = fs.readFileSync(filePath, "utf-8").toString();
+  const template = handlebars.compile(source);
+  const replacements = {
+    link: password,
+  };
+  const htmlToSend = template(replacements);
+  let from = `${process.env.APP_NAME} <no-reply${process.env.MAILER_DOMAIN}>`;
+
+  const mailOptions = {
+    from: from,
+    to: email,
+    subject: "Issyne Password Reset",
+    html: htmlToSend,
+  };
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       console.log(error);
-      res.json({ success: false, message: "Something Went Wrong" });
+      res.json({ success: false, message: error.message });
     } else {
       res.json({ success: true, message: "Password Changed" });
 

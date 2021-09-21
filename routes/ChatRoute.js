@@ -4,7 +4,7 @@ const Firebase = require("firebase-admin");
 const { database } = require("firebase-admin");
 const multer = require("multer");
 const { json } = require("body-parser");
-
+const moment = require("moment")
 const MEDIA_TYPES = {
   text: "text",
   document: "doc",
@@ -78,22 +78,30 @@ router.post("/get", async function (req, res) {
 
             if (childSnapshotClone.teacherEmail != undefined) {
               let teacher = await db  // append teacher photo with chat db
-              .ref("teacher")
-              .orderByChild("email")
-              .equalTo(childSnapshotClone.teacherEmail)
-              .on("child_added", async function (snapshot, prevChildKey) {
-                let photo=snapshot.val();
-                childSnapshotClone.teacherAvatar=photo.avatar;
-              });
-
-
+                .ref("teacher")
+                .orderByChild("email")
+                .equalTo(childSnapshotClone.teacherEmail)
+                .on("child_added", async function (snapshot, prevChildKey) {
+                  let photo = snapshot.val();
+                  childSnapshotClone.teacherAvatar = photo.avatar;
+                  if (data.startTime && data.endTime) {
+                    // start time and end time
+                    let startTime = moment(data.startTime, "HH:mm:ss a");
+                    let endTime = moment(data.endTime, "HH:mm:ss a");
+                    // calculate total duration
+                    let duration = moment.duration(endTime.diff(startTime));
+                    let result = Math.abs(duration.asMinutes()) % 60;
+                    let newResult = result / 5;
+                    childSnapshotClone.credit = newResult;
+                  }
+                });
               const teacherVal = await db
                 .ref("teacher")
                 .orderByChild("email")
                 .equalTo(childSnapshotClone.teacherEmail)
                 .once("value");
-               
-           
+
+
               let teacherClone = null;
               await teacherVal.forEach((val) => {
                 teacherClone = val;
@@ -109,11 +117,28 @@ router.post("/get", async function (req, res) {
             childSnapshotClone.key = childSnapShot.key;
 
             if (childSnapshotClone.studentEmail != undefined) {
+              await db  // append teacher photo with chat db
+                .ref("student")
+                .orderByChild("email")
+                .equalTo(childSnapshotClone.teacherEmail)
+                .on("child_added", async function (snapshot, prevChildKey) {
+                  if (data.startTime && data.endTime) {
+                    // start time and end time
+                    let startTime = moment(data.startTime, "HH:mm:ss a");
+                    let endTime = moment(data.endTime, "HH:mm:ss a");
+                    // calculate total duration
+                    let duration = moment.duration(endTime.diff(startTime));
+                    let result = Math.abs(duration.asMinutes()) % 60;
+                    let newResult = result / 5;
+                    childSnapshotClone.credit = newResult;
+                  }
+                });
               const studentVal = await db
                 .ref("student")
                 .orderByChild("email")
                 .equalTo(childSnapshotClone.studentEmail)
                 .once("value");
+
               let studentClone = null;
               await studentVal.forEach((val) => {
                 studentClone = val;
@@ -305,5 +330,27 @@ router.post("/send_message", upload.single("media"), async function (req, res) {
     return res.json(null);
   }
 });
+
+// update credit
+
+router.post("/update_credit", async function (req, res) {
+
+  try {
+    // start time and end time
+    var startTime = moment(req.body.startTime, "HH:mm:ss a");
+    var endTime = moment(req.body.endTime, "HH:mm:ss a");
+    // calculate total duration
+    var duration = moment.duration(endTime.diff(startTime));
+    let result = Math.abs(duration.asMinutes()) % 60;
+    let newResult = result / 5;
+    return res.json({ result: newResult });
+
+  } catch (error) {
+    return res.json({ message: error.message });
+
+  }
+
+
+})
 
 module.exports = router;
