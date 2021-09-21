@@ -3,7 +3,9 @@ const router = express.Router();
 const Firebase = require("firebase-admin");
 var nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
-
+const handlebars = require("handlebars");
+const fs = require("fs");
+const path = require("path");
 const db = Firebase.database();
 
 const teacherDb = db.ref("teacher");
@@ -78,13 +80,25 @@ function sendEmail(email, password, res) {
     },
   });
 
-  var mailOptions = {
-    from: process.env.MAILER_SENDER_EMAIL,
+  const filePath = path.join(
+    __dirname,
+    "../html_templates/requestResetPassword.html"
+  );
+
+  const source = fs.readFileSync(filePath, "utf-8").toString();
+  const template = handlebars.compile(source);
+  const replacements = {
+    link: password,
+  };
+  const htmlToSend = template(replacements);
+  let from = `${process.env.APP_NAME} <no-reply${process.env.MAILER_DOMAIN}>`;
+
+  const mailOptions = {
+    from: from,
     to: email,
     subject: "Issyne Password Reset",
-    text: "Your New Password: " + password,
+    html: htmlToSend,
   };
-
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       console.log(error);
