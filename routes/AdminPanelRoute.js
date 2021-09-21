@@ -65,6 +65,7 @@ router.get("/get_courses", (req, res) => CourseService.getAll(req, res));
 //============== Admin Registartion Start   ===================
 
 // =============== out of scope ===========================
+//  whenever you want to create admin use this api
 // router.post ('/register', async (req, res) => {
 //   var data = JSON.parse (JSON.stringify (req.body));
 //   if (data.email != undefined && data.password != undefined) {

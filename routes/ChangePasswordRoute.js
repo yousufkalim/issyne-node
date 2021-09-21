@@ -71,24 +71,24 @@ router.post("/forgot_password", async function (req, res) {
 
 function sendEmail(email, password, res) {
   var transporter = nodemailer.createTransport({
-    service: "gmail",
+    service: process.env.MAILER_HOST,
     auth: {
-      user: "yousaf.falcon321@gmail.com",
-      pass: "yousafFalcon123",
+      user: process.env.MAILER_SENDER_EMAIL,
+      pass: process.env.MAILER_PASSWORD,
     },
   });
 
   var mailOptions = {
-    from: "yousaf.falcon321@gmail.com",
-    to: "yousaf.butt25@yahoo.com",
-    subject: "Your New Password Is",
-    text: password,
+    from: process.env.MAILER_SENDER_EMAIL,
+    to: email,
+    subject: "Issyne Password Reset",
+    text: "Your New Password: " + password,
   };
 
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       console.log(error);
-      res.json({ success: false, message: "Something Went Wrong" });
+      res.json({ success: false, message: error.message });
     } else {
       res.json({ success: true, message: "Password Changed" });
 
