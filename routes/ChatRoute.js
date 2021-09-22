@@ -4,7 +4,7 @@ const Firebase = require("firebase-admin");
 const { database } = require("firebase-admin");
 const multer = require("multer");
 const { json } = require("body-parser");
-const moment = require("moment")
+const moment = require("moment");
 const MEDIA_TYPES = {
   text: "text",
   document: "doc",
@@ -56,6 +56,7 @@ router.post("/get", async function (req, res) {
   const db = Firebase.database();
   const chatRef = db.ref("chat");
   var data = JSON.parse(JSON.stringify(req.body));
+  console.log(data, "data");
   try {
     const dataArray = [];
     chatRef.once("value", async function (snapshot) {
@@ -77,7 +78,7 @@ router.post("/get", async function (req, res) {
             childSnapshotClone.key = childSnapShot.key;
 
             if (childSnapshotClone.teacherEmail != undefined) {
-              let teacher = await db  // append teacher photo with chat db
+              let teacher = await db // append teacher photo with chat db
                 .ref("teacher")
                 .orderByChild("email")
                 .equalTo(childSnapshotClone.teacherEmail)
@@ -101,7 +102,6 @@ router.post("/get", async function (req, res) {
                 .equalTo(childSnapshotClone.teacherEmail)
                 .once("value");
 
-
               let teacherClone = null;
               await teacherVal.forEach((val) => {
                 teacherClone = val;
@@ -117,7 +117,7 @@ router.post("/get", async function (req, res) {
             childSnapshotClone.key = childSnapShot.key;
 
             if (childSnapshotClone.studentEmail != undefined) {
-              await db  // append teacher photo with chat db
+              await db // append teacher photo with chat db
                 .ref("student")
                 .orderByChild("email")
                 .equalTo(childSnapshotClone.teacherEmail)
@@ -200,7 +200,7 @@ router.post("/get", async function (req, res) {
       //   }
       // });
     });
-  } catch (error) { }
+  } catch (error) {}
 
   // try {
   //   chatRef
@@ -334,7 +334,6 @@ router.post("/send_message", upload.single("media"), async function (req, res) {
 // update credit
 
 router.post("/update_credit", async function (req, res) {
-
   try {
     // start time and end time
     var startTime = moment(req.body.startTime, "HH:mm:ss a");
@@ -344,13 +343,47 @@ router.post("/update_credit", async function (req, res) {
     let result = Math.abs(duration.asMinutes()) % 60;
     let newResult = result / 5;
     return res.json({ result: newResult });
-
   } catch (error) {
     return res.json({ message: error.message });
-
   }
+});
 
+// update teacher status for chat if it is busy to another chat
 
-})
+router.post("/update_teacher_status", async function (req, res) {
+  try {
+    const db = Firebase.database(); //firebase instance
+    let email = req.body.email; //email from body
+    let isBusy = req.body.isBusy; //isBusy key from body
+    let result = await db
+      .ref("teacher")
+      .orderByChild("email")
+      .equalTo(email)
+      .once("value", async function (snapshotTeacher) {
+        let teacher = snapshotTeacher.val();
+        if (teacher == null) {
+          return res.json({
+            message: "Email does not exists!",
+            success: false,
+          });
+        }
+
+        const keyTeacher = Object.keys(teacher)[0];
+
+        await Firebase.database()
+          .ref("teacher/" + keyTeacher)
+          .update({
+            isBusy: isBusy,
+          });
+        return res.json({
+          message: "Teacher status updated successfully",
+          teacher: teacher,
+          success: true,
+        });
+      });
+  } catch (error) {
+    return res.json({ message: error.message });
+  }
+});
 
 module.exports = router;
