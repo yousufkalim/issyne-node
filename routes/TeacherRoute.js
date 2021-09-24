@@ -102,12 +102,9 @@ router.post(
 
                 console.log("here");
               } else
-                return await res.json({
-                  success: false,
-                  message: "Incorrect Password",
-                });
-            } else {
-              //  await res.json({ success: false });
+                return res
+                  .status(500)
+                  .json({ message: "Password not matched" });
             }
             if (hashedPassword != null) {
               delete data["newpass"];
@@ -122,11 +119,12 @@ router.post(
               message: "Profile Updated Successfully",
             });
           } else {
+            return res.status(500).json({ message: "Something went wrong" });
           }
         });
     } catch (error) {
       console.log(error.message);
-      res.json({ message: error.message });
+      return res.status(500).json({ message: "Something went wrong" });
     }
   }
 );
