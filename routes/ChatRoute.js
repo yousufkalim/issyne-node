@@ -1,13 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const Firebase = require("firebase-admin");
-const { database } = require("firebase-admin");
 const multer = require("multer");
-const { json } = require("body-parser");
 const moment = require("moment");
 const fs = require("fs");
 
-const Lame = require("node-lame").Lame;
 var Buffer = require("buffer/").Buffer;
 const MEDIA_TYPES = {
   text: "text",
