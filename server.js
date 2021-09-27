@@ -31,7 +31,7 @@ const path = require("path");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads", express.static("uploads", {maxAge: 36000000}));
 app.use("/chat_files", express.static(path.join(__dirname, "chat_files")));
 
 const studentRouters = require("./routes/StudentRegisterRoute");
