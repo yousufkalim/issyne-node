@@ -40,10 +40,11 @@ router.post("/get_credit", async function (req, res) {
 router.post("/form", async function (req, res) {
   try {
     var data = JSON.parse(JSON.stringify(req.body));
+    console.log(data, "data");
     const expDate = {
-      day: parseInt(moment(data.expiration_date).format("DD")),
-      month: parseInt(moment(data.expiration_date).format("MM")),
-      year: parseInt(moment(data.expiration_date).format("YYYY")),
+      day: parseInt(moment(new Date(data.expiration_date)).format("DD")),
+      month: parseInt(moment(new Date(data.expiration_date)).format("MM")),
+      year: parseInt(moment(new Date(data.expiration_date)).format("YYYY")),
     };
 
     // console.log("DATAE", data, expDate);
@@ -54,19 +55,40 @@ router.post("/form", async function (req, res) {
       .once("value", async function (snapshot) {
         if (snapshot.val() === null) {
           await formRef.push(data);
+          return res.json({
+            data: {
+              card_num: data.card_num,
+              cvc: data.ccv,
+              ExpDate: data.expiration_date,
+              expMonth: expDate.month,
+              expYear: expDate.year,
+            },
+            success: true,
+          });
         } else {
           let snapshotClone = { ...snapshot.val() };
           snapshotClone = { ...data };
+
           const key = Object.keys(snapshot.val())[0];
+
           await Firebase.database()
             .ref("cardForm/" + key)
             .update(snapshotClone);
+
           await Firebase.database()
             .ref("student/")
             .orderByChild("email")
             .equalTo(data.email)
             .once("value", async function (snapshotStudent) {
+              if (snapshotStudent.val() === null) {
+                return res.json({
+                  success: false,
+                  message: "student not found with this email",
+                });
+              }
+
               const keyStudent = Object.keys(snapshotStudent.val())[0];
+
               await Firebase.database()
                 .ref("student/" + keyStudent)
                 .update({
@@ -93,7 +115,7 @@ router.post("/form", async function (req, res) {
       });
   } catch (error) {
     console.log(error.message);
-    return res.json({ success: false,message:error.message });
+    return res.json({ success: false, message: error.message });
   }
 });
 
@@ -110,6 +132,7 @@ router.post("/bankinfo", async function (req, res) {
       .once("value", async function (snapshot) {
         if (snapshot.val() === null) {
           await formRef.push(data);
+          return res.json({ data: data, success: true });
         } else {
           let snapshotClone = { ...snapshot.val() };
           snapshotClone = { ...data };
@@ -122,8 +145,13 @@ router.post("/bankinfo", async function (req, res) {
             .orderByChild("email")
             .equalTo(data.email)
             .once("value", async function (snapshotTeacher) {
+              if (snapshotTeacher.val() === null) {
+                return res.json({
+                  success: false,
+                  message: "teacher not found with this email",
+                });
+              }
               const keyTeacher = Object.keys(snapshotTeacher.val())[0];
-          
               await Firebase.database()
                 .ref("teacher/" + keyTeacher)
                 .update({
@@ -151,7 +179,7 @@ router.post("/bankinfo", async function (req, res) {
 router.post("/post_credit", async function (req, res) {
   try {
     var data = JSON.parse(JSON.stringify(req.body));
-  
+
     const creditRef = await Firebase.database().ref("credit");
     creditRef
       .orderByChild("email")
