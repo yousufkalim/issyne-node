@@ -40,7 +40,6 @@ router.post("/get_credit", async function (req, res) {
 router.post("/form", async function (req, res) {
   try {
     var data = JSON.parse(JSON.stringify(req.body));
-    console.log(data, "data");
     const expDate = {
       day: parseInt(moment(new Date(data.expiration_date)).format("DD")),
       month: parseInt(moment(new Date(data.expiration_date)).format("MM")),
@@ -321,7 +320,7 @@ router.post("/addBank", async function (req, res) {
     res.json({ success: true });
   } catch (error) {
     console.log("Add Bank", error);
-    res.json({ success: false });
+    res.json({ success: false, message: error.message });
   }
 });
 
