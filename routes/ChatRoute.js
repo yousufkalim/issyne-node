@@ -267,6 +267,7 @@ function getMessageType(mimeType) {
 
 router.post("/send_message", upload.single("media"), async function (req, res) {
   try {
+    console.log("Body ----> ", req.body);
     let date = Date.now() + 3600000;
     let fileName = date + ".wav"; //audio file name
     let fileType = "audio/wave"; //audio file type
@@ -276,7 +277,7 @@ router.post("/send_message", upload.single("media"), async function (req, res) {
     var data = JSON.parse(JSON.stringify(req.body));
     const chatRef = db.ref("chat/" + data.chatKey);
 
-    let message = "";
+    let message = req.body.message;
     let messageType = MEDIA_TYPES.text;
 
     if (req.file != undefined) {
