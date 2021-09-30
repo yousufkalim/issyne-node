@@ -119,7 +119,10 @@ router.post(
               message: "Profile Updated Successfully",
             });
           } else {
-            return res.status(500).json({ message: "Something went wrong" });
+            return res.json({
+              success: false,
+              message: "invalid email",
+            });
           }
         });
     } catch (error) {
