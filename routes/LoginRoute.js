@@ -21,7 +21,7 @@ router.post("/login", async (req, res) => {
           .equalTo(data.email)
           .once("value", async function (snapshot) {
             if (snapshot.val() === null) {
-              res.json({ message: "Email Does not Exist" });
+              res.json({ message: "L'e-mail n'existe pas" });
             } else {
               const val = snapshot.val();
               var key = Object.keys(snapshot.val())[0];
@@ -37,7 +37,7 @@ router.post("/login", async (req, res) => {
                 });
               } else
                 res.json({
-                  message: "Invaid Credentials",
+                  message: "Identifiants non valides",
                   success: false,
                 });
             }
@@ -57,7 +57,7 @@ router.post("/login", async (req, res) => {
           });
         } else
           res.json({
-            message: "Invaid Credentials",
+            message: "Identifiants non valides",
             success: false,
           });
       }
@@ -81,7 +81,8 @@ router.post("/login_social", async (req, res) => {
 
               res.json({
                 success: true,
-                message: "Fill The From To Complate Registration.",
+                message:
+                  "Remplissez le formulaire De à Compléter l'enregistrement.",
                 isSocial: true,
               });
             } else {
@@ -101,7 +102,7 @@ router.post("/login_social", async (req, res) => {
               else
                 res.json({
                   message:
-                    "Email Registered As Non Social Account Please Enter Password",
+                    "E-mail enregistré en tant que compte non social Veuillez saisir le mot de passe",
                   success: false,
                 });
             }
@@ -125,7 +126,7 @@ router.post("/login_social", async (req, res) => {
         else
           res.json({
             message:
-              "Email Registered As Non Social Account Please Enter Password",
+              "E-mail enregistré en tant que compte non social Veuillez saisir le mot de passe",
             success: false,
           });
       }

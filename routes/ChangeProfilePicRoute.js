@@ -65,7 +65,7 @@ router.post(
             res.json({
               success: true,
               avatar: req.file.path,
-              message: "Profile Picture Updated",
+              message: "Photo de profil mise à jour",
             });
           } catch (error) {
             res.json({ success: false });

@@ -33,7 +33,8 @@ const upload = multer({
 router.get("/find", async (req, res) => {
   try {
     userRef.once("value", async function (snapshot) {
-      if (snapshot.val() === null) res.json({ message: "No Data Found" });
+      if (snapshot.val() === null)
+        res.json({ message: "Aucune donnée disponible" });
       else {
         const response = [];
         snapshot.forEach(function (childSnapshot) {
@@ -68,7 +69,10 @@ router.post(
       data.diploma = diplomaFile.path;
       data.isActive = true;
       data.rating = 3;
-      data.isSocial = true;
+      data.isSocial =
+        req.body.isSocial === "false" || req.body.isSocial === false
+          ? false
+          : true;
       data.type = "teacher";
       userRef
         .orderByChild("email")
@@ -87,24 +91,18 @@ router.post(
                   const response = { ...data };
                   data.password = hashedPassword;
                   await userRef.push(data, function (err) {
-                    if (err) {
-                      return res.status(500).json(err);
-                    } else
-                      return res.json({
+                    if (err) res.send(err);
+                    else
+                      res.json({
                         response: response,
                       });
                   });
-                } else
-                  return res
-                    .status(500)
-                    .json({ message: "Email Already Exists" });
+                } else res.json({ messge: "L'email existe déjà" });
               });
-          } else
-            return res.status(500).json({ message: "Email Already Exists" });
+          } else res.json({ messge: "L'email existe déjà" });
         });
     } catch (error) {
-      console.log("Error --> ", error);
-      return res.status(500).json({ message: error });
+      res.json({ message: error.message });
     }
   }
 );
@@ -130,7 +128,10 @@ router.post(
       data.diploma = diplomaFile.path;
       data.isActive = true;
       data.rating = 3;
-      data.isSocial = true;
+      data.isSocial =
+        req.body.isSocial === "false" || req.body.isSocial === false
+          ? false
+          : true;
       data.type = "teacher";
       userRef
         .orderByChild("email")
@@ -155,13 +156,12 @@ router.post(
                         response: response,
                       });
                   });
-                } else res.json({ messge: "Email Already Exists" });
+                } else res.json({ messge: "L'email existe déjà" });
               });
-          } else res.json({ messge: "Email Already Exists" });
+          } else res.json({ messge: "L'email existe déjà" });
         });
     } catch (error) {
-      res.json({ message: "All Fields Are Required" });
-    }
+      res.json({ message: "Tous les champs sont requis" });
   }
 );
 module.exports = router;

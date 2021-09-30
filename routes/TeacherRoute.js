@@ -36,11 +36,14 @@ router.post("/get_teacher", async (req, res) => {
             res.json(childSnapshot.val());
           });
         } else {
-          res.json({ success: false, message: "something went wrong" });
+          res.json({
+            success: false,
+            message: "quelque chose s'est mal passé",
+          });
         }
       });
   } catch (error) {
-    res.json({ success: false, message: "something went wrong" });
+    res.json({ success: false, message: "quelque chose s'est mal passé" });
   }
 });
 
@@ -104,7 +107,7 @@ router.post(
               } else
                 return res
                   .status(500)
-                  .json({ message: "Password not matched" });
+                  .json({ message: "Mot de passe incorrect" });
             }
             if (hashedPassword != null) {
               delete data["newpass"];
@@ -116,12 +119,12 @@ router.post(
               .update(snapShotClone.data);
             return res.json({
               success: true,
-              message: "Profile Updated Successfully",
+              message: "Mise à jour du profil réussie",
             });
           } else {
             return res.json({
               success: false,
-              message: "invalid email",
+              message: "email invalide",
             });
           }
         });
@@ -147,15 +150,18 @@ router.post("/change_status", async (req, res) => {
               const clone = { ...childSnapshot.val() };
               clone.isActive = req.body.status;
               ref.update(clone);
-              res.json({ success: true, message: "Status changes" });
+              res.json({ success: true, message: "Changements de statut" });
             }
           });
         } else {
-          res.json({ success: false, message: "something went wrong" });
+          res.json({
+            success: false,
+            message: "quelque chose s'est mal passé",
+          });
         }
       });
   } catch (error) {
-    res.json({ success: false, message: "something went wrong" });
+    res.json({ success: false, message: "quelque chose s'est mal passé" });
   }
 });
 module.exports = router;

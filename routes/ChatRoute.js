@@ -373,7 +373,7 @@ router.post("/update_teacher_status", async function (req, res) {
         let teacher = snapshotTeacher.val();
         if (teacher == null) {
           return res.json({
-            message: "Email does not exists!",
+            message: "L'e-mail n'existe pas !",
             success: false,
           });
         }
@@ -386,7 +386,7 @@ router.post("/update_teacher_status", async function (req, res) {
             isBusy: isBusy,
           });
         return res.json({
-          message: "Teacher status updated successfully",
+          message: "Statut de l'enseignant mis à jour avec succès",
           teacher: teacher,
           success: true,
         });

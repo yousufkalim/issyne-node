@@ -74,11 +74,11 @@ router.post("/rate", async function (req, res) {
             chatRef.update(chatObject);
           });
 
-          res.json({ success: true, message: "Teacher Rated Successfully" });
+          res.json({ success: true, message: "Enseignant évalué avec succès" });
         } catch (err) {
           res.json({
             success: false,
-            message: "Something went wrong \n" + err.message,
+            message: "Quelque chose s'est mal passé \n" + err.message,
           });
         }
       } else {
@@ -132,7 +132,7 @@ router.post("/rate", async function (req, res) {
           chatRef.update(chatObject);
         });
 
-        res.json({ success: true, message: "Teacher Rated Successfully" });
+        res.json({ success: true, message: "Enseignant évalué avec succès" });
       }
     });
 });

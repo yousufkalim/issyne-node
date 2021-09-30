@@ -36,7 +36,7 @@ router.post("/stripe", async function (req, res) {
     // console.log("paymentIntent.status", paymentIntent.status);
 
     if (paymentIntent.status !== "succeeded") {
-      res.json({ success: false, message: "Something went wrong" });
+      res.json({ success: false, message: "Quelque chose s'est mal passé !" });
     } else res.json({ success: true, paymentIntent });
   } catch (error) {
     console.log(error);

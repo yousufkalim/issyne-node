@@ -32,11 +32,11 @@ router.post("/push_notification", async function (req, res) {
     .sendToDevice(registrationToken, payload, options)
     .then((response) => {
       console.log("notificaion sent");
-      res.json({ success: true, message: "notification sent" });
+      res.json({ success: true, message: "notification envoyée" });
       // res.status (200).send ('Notification sent successfully');
     })
     .catch((error) => {
-      res.json({ success: true, message: "notification sent" });
+      res.json({ success: true, message: "notification envoyée" });
 
       console.log(error);
     });

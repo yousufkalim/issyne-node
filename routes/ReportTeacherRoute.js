@@ -1,29 +1,32 @@
-const express = require ('express');
-const router = express.Router ();
-const Firebase = require ('firebase-admin');
+const express = require("express");
+const router = express.Router();
+const Firebase = require("firebase-admin");
 
-router.post ('/report_teacher', async function (req, res) {
-  var data = JSON.parse (JSON.stringify (req.body));
-    console.log(data)
+router.post("/report_teacher", async function (req, res) {
+  var data = JSON.parse(JSON.stringify(req.body));
+  console.log(data);
   if (data.report === undefined || data.report.length === 0) {
     // CHECK IF THE TEXT SENT WAS EMPTY
-    res.json ({
+    res.json({
       success: false,
-      message: 'You need to give reason in order to submit',
+      message: "Vous devez justifier la soumission",
     });
   }
-  const reportRef = Firebase.database ().ref ('report_teacher');
+  const reportRef = Firebase.database().ref("report_teacher");
   const param = {
     studentEmail: data.studentEmail,
     teacherEmail: data.teacherEmail,
     report: data.report,
-    chatKey:data.chatKey,
+    chatKey: data.chatKey,
   };
   try {
-    reportRef.push (param);
-    res.json ({success: true, message: 'report submitted'});
+    reportRef.push(param);
+    res.json({ success: true, message: "rapport soumis" });
   } catch (err) {
-    res.json ({success: false, message: 'something went wrong try again'});
+    res.json({
+      success: false,
+      message: "quelque chose s'est mal passé essaie encore",
+    });
   }
 });
 
