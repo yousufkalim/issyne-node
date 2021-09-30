@@ -69,7 +69,10 @@ router.post(
       data.diploma = diplomaFile.path;
       data.isActive = true;
       data.rating = 3;
-      data.isSocial = true;
+      data.isSocial =
+        req.body.isSocial === "false" || req.body.isSocial === false
+          ? false
+          : true;
       data.type = "teacher";
       userRef
         .orderByChild("email")
@@ -125,7 +128,10 @@ router.post(
       data.diploma = diplomaFile.path;
       data.isActive = true;
       data.rating = 3;
-      data.isSocial = true;
+      data.isSocial =
+        req.body.isSocial === "false" || req.body.isSocial === false
+          ? false
+          : true;
       data.type = "teacher";
       userRef
         .orderByChild("email")
