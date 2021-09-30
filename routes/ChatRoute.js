@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const Firebase = require("firebase-admin");
-const { database } = require("firebase-admin");
 const multer = require("multer");
-const { json } = require("body-parser");
 const moment = require("moment");
+const fs = require("fs");
+
+var Buffer = require("buffer/").Buffer;
 const MEDIA_TYPES = {
   text: "text",
   document: "doc",
@@ -56,7 +57,6 @@ router.post("/get", async function (req, res) {
   const db = Firebase.database();
   const chatRef = db.ref("chat");
   var data = JSON.parse(JSON.stringify(req.body));
-  console.log(data, "data");
   try {
     const dataArray = [];
     chatRef.once("value", async function (snapshot) {
@@ -267,13 +267,19 @@ function getMessageType(mimeType) {
 
 router.post("/send_message", upload.single("media"), async function (req, res) {
   try {
-    console.log(JSON.stringify(req.body));
+    console.log("Body ----> ", req.body);
+    let date = Date.now() + 3600000;
+    let fileName = date + ".wav"; //audio file name
+    let fileType = "audio/wave"; //audio file type
+    let audioFileBuffer = req.body.audio; //audio base64
+
     const db = Firebase.database();
     var data = JSON.parse(JSON.stringify(req.body));
     const chatRef = db.ref("chat/" + data.chatKey);
 
-    let message = "";
+    let message = req.body.message;
     let messageType = MEDIA_TYPES.text;
+
     if (req.file != undefined) {
       messageType = getMessageType(req.file.mimetype);
 
@@ -284,8 +290,12 @@ router.post("/send_message", upload.single("media"), async function (req, res) {
 
       let path = req.file.path.split("\\");
       message = req.file.filename;
-    } else message = data.message;
-    console.log("dulasd " + JSON.stringify(req.file));
+    } else if (audioFileBuffer != undefined) {
+      const buff = Buffer.from(audioFileBuffer, "base64"); //read audio base64 file
+      fs.writeFileSync(`uploads/audio_files/${fileName}`, buff); //save file  in uploads/audio_files
+      messageType = fileType;
+      message = fileName;
+    }
     chatRef.once("value", async function (snapshot) {
       snapshot.forEach(async function (childSnapShot) {
         const messageRef = db.ref("chat/" + data.chatKey);
@@ -322,12 +332,12 @@ router.post("/send_message", upload.single("media"), async function (req, res) {
         console.log("Successfully sent message:", response);
       })
       .catch((error) => {
-        res.json({ success: false });
+        res.json({ success: false, message: error.message });
 
         console.log("Error sending message:", error);
       });
   } catch (error) {
-    return res.json(null);
+    return res.json({ message: error.message });
   }
 });
 

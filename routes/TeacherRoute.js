@@ -105,12 +105,9 @@ router.post(
 
                 console.log("here");
               } else
-                return await res.json({
-                  success: false,
-                  message: "Mot de passe incorrect",
-                });
-            } else {
-              //  await res.json({ success: false });
+                return res
+                  .status(500)
+                  .json({ message: "Mot de passe incorrect" });
             }
             if (hashedPassword != null) {
               delete data["newpass"];
@@ -133,7 +130,7 @@ router.post(
         });
     } catch (error) {
       console.log(error.message);
-      res.json({ message: error.message });
+      return res.status(500).json({ message: "Something went wrong" });
     }
   }
 );
