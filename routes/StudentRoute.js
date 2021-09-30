@@ -69,7 +69,7 @@ router.post(
             data.password = hashedPassword;
           }
           snapShotClone = { data };
-           await Firebase.database()
+          await Firebase.database()
             .ref("student/" + key)
             .update(snapShotClone.data);
           return res.json({
@@ -77,6 +77,10 @@ router.post(
             message: "Profile Updated Successfully",
           });
         } else {
+          return res.json({
+            success: false,
+            message: "Invalid email",
+          });
         }
       });
   }

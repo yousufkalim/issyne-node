@@ -122,6 +122,10 @@ router.post(
               message: "Profile Updated Successfully",
             });
           } else {
+            return res.json({
+              success: false,
+              message: "invalid email",
+            });
           }
         });
     } catch (error) {
