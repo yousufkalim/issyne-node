@@ -89,7 +89,7 @@ router.post("/login", async (req, res) => {
     .equalTo(data.email)
     .once("value", async function (snapshot) {
       if (snapshot.val() === null) {
-        res.json({ success: false, message: "Email does not exist" });
+        res.json({ success: false, message: "L'e-mail n'existe pas" });
       } else {
         const val = snapshot.val();
         var key = Object.keys(snapshot.val())[0];
@@ -99,7 +99,7 @@ router.post("/login", async (req, res) => {
           res.json({ success: true, user: val[key] });
         } else
           res.json({
-            message: "Invaid Credentials",
+            message: "Identifiants non valides",
             success: false,
           });
       }

@@ -59,7 +59,7 @@ router.post(
             } else
               return await res.json({
                 success: false,
-                message: "Incorrect Password",
+                message: "Mot de passe incorrect",
               });
           } else {
             //  await res.json({ success: false });
@@ -74,12 +74,12 @@ router.post(
             .update(snapShotClone.data);
           return res.json({
             success: true,
-            message: "Profile Updated Successfully",
+            message: "Mise à jour du profil réussie",
           });
         } else {
           return res.json({
             success: false,
-            message: "Invalid email",
+            message: "Email invalide",
           });
         }
       });

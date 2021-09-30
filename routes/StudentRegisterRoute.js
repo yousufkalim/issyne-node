@@ -71,12 +71,12 @@ router.post("/register", upload.single("profileImage"), async (req, res) => {
               res.status(200).json({
                 response: response,
               });
-            } else res.json({ message: "Email Already Exists" });
+            } else res.json({ message: "L'email existe déjà" });
           })
           .catch((err) => {
             console.log("Error", err);
           });
-      } else res.json({ message: "Email Already Exists" });
+      } else res.json({ message: "L'email existe déjàs" });
     })
     .catch((err) => {
       console.log("Error", err);
@@ -119,9 +119,9 @@ router.post(
                 res.json({
                   response: response,
                 });
-              } else res.json({ message: "Email Already Exists" });
+              } else res.json({ message: "L'email existe déjà" });
             });
-        } else res.json({ message: "Email Already Exists" });
+        } else res.json({ message: "L'email existe déjà" });
       });
   }
 );

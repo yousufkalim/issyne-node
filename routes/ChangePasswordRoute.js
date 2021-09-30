@@ -24,7 +24,7 @@ router.post("/forgot_password", async function (req, res) {
           .once("value", async function (snapshot) {
             if (snapshot.val() === null) {
               // the email does not exist
-              res.json({ success: false, message: "The email does not exist" });
+              res.json({ success: false, message: "L'email n'existe pas" });
             } else {
               console.log("student");
 
@@ -35,7 +35,7 @@ router.post("/forgot_password", async function (req, res) {
                   return res.json({
                     success: false,
                     message:
-                      "Update Failed. This email is registered as a social account",
+                      "Mise à jour a échoué. Cet e-mail est enregistré en tant que compte social",
                   });
                 }
                 const clone = { ...childsnapshot.val() };
@@ -58,7 +58,7 @@ router.post("/forgot_password", async function (req, res) {
             return res.json({
               success: false,
               message:
-                "Update Failed. This email is registered as a social account",
+                "Mise à jour a échoué. Cet e-mail est enregistré en tant que compte social",
             });
           }
           const clone = { ...childsnapshot.val() };
@@ -104,7 +104,7 @@ function sendEmail(email, password, res) {
       console.log(error);
       res.json({ success: false, message: error.message });
     } else {
-      res.json({ success: true, message: "Password Changed" });
+      res.json({ success: true, message: "Mot de passe changé" });
 
       console.log("Email sent: " + info.response);
     }
