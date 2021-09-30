@@ -163,5 +163,5 @@ router.post(
     } catch (error) {
       res.json({ message: "Tous les champs sont requis" });
   }
-);
+  });
 module.exports = router;
