@@ -4,6 +4,7 @@ const Firebase = require("firebase-admin");
 const multer = require("multer");
 const moment = require("moment");
 const fs = require("fs");
+const socket = require("../server");
 
 var Buffer = require("buffer/").Buffer;
 const MEDIA_TYPES = {
@@ -393,6 +394,22 @@ router.post("/update_teacher_status", async function (req, res) {
       });
   } catch (error) {
     return res.json({ message: error.message });
+  }
+});
+router.post("/sendMessage", upload.single("image"), async function (req, res) {
+  try {
+    const audioFileBuffer = req.body.audio;
+    let date = Date.now() + 3600000;
+
+    let fileName = date + ".wav"; //audio file name
+    let file = req.file;
+    const buff = Buffer.from(audioFileBuffer, "base64");
+    fs.writeFileSync(`uploads/audio_files/${fileName}`, buff);
+    const contents = await fs.readFile(`uploads/audio_files/${fileName}`);
+    console.log(contents, "contents");
+    res.json({ success: "success", fileName });
+  } catch (err) {
+    res.json({ message: err.message });
   }
 });
 

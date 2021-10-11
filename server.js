@@ -1,7 +1,17 @@
 require("dotenv").config();
+
 const express = require("express");
-const cors = require("cors");
+const app = express();
 const morgan = require("morgan");
+const cors = require("cors");
+
+const server = require("http").createServer(app);
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "*",
+  },
+});
+require("./services/socket-io.js")(io);
 
 var admin = require("firebase-admin");
 
@@ -11,25 +21,20 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://issyne-383fb-default-rtdb.firebaseio.com",
 });
-
-var bodyParser = require("body-parser");
-const app = express();
 app.use(morgan("dev"));
 
 app.use(cors());
+app.use(express.urlencoded({ extended: false }));
+
+app.use(express.json());
+
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "*");
 
   next();
 });
-
-app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
 const path = require("path");
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
 
 app.use("/uploads", express.static("uploads", { maxAge: 36000000 }));
 app.use("/chat_files", express.static(path.join(__dirname, "chat_files")));
@@ -74,6 +79,8 @@ app.use("/admin_panel", AdminPanelRoute);
 const PackagesRoute = require("./routes/PackagesRoute");
 app.use("/", PackagesRoute);
 
-app.listen(5000, () => {
-  console.log("server started");
+// start server
+const port = process.env.PORT || 5000;
+server.listen(port, function () {
+  console.log("Server listening on port " + port);
 });
